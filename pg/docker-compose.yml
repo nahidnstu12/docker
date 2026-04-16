@@ -1,0 +1,53 @@
+services:
+  postgresql:
+    image: postgres:16
+    container_name: shared-postgresql
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - postgres-network
+    restart: unless-stopped
+
+  postgresql-vector:
+    image: pgvector/pgvector:pg16
+    container_name: shared-postgresql-vector
+    ports:
+      - "5433:5432" # host:container
+    volumes:
+      - postgresql_vector_data:/var/lib/postgresql/data
+      - ./init-vector:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=ai_learning
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d ai_learning"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - postgres-network
+    restart: unless-stopped
+
+networks:
+  postgres-network:
+    driver: bridge
+    name: shared-postgres-network
+
+volumes:
+  postgresql_data:
+    driver: local
+  postgresql_vector_data:
+    driver: local
