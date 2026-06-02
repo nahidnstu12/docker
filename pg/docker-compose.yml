@@ -1,11 +1,11 @@
 services:
   postgresql:
-    image: postgres:16
+    image: postgres:18.4
     container_name: shared-postgresql
     ports:
       - "5432:5432"
     volumes:
-      - postgresql_data:/var/lib/postgresql/data
+      - postgresql_18_data:/var/lib/postgresql
       - ./init:/docker-entrypoint-initdb.d
     environment:
       - POSTGRES_USER=admin
@@ -21,12 +21,12 @@ services:
     restart: unless-stopped
 
   postgresql-vector:
-    image: pgvector/pgvector:pg16
+    image: pgvector/pgvector:0.8.2-pg18
     container_name: shared-postgresql-vector
     ports:
       - "5433:5432" # host:container
     volumes:
-      - postgresql_vector_data:/var/lib/postgresql/data
+      - postgresql_vector_18_data:/var/lib/postgresql
       - ./init-vector:/docker-entrypoint-initdb.d
     environment:
       - POSTGRES_USER=admin
@@ -47,7 +47,7 @@ networks:
     name: shared-postgres-network
 
 volumes:
-  postgresql_data:
+  postgresql_18_data:
     driver: local
-  postgresql_vector_data:
+  postgresql_vector_18_data:
     driver: local
